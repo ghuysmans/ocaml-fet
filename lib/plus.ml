@@ -1,4 +1,4 @@
-type 'a t = 'a No_plus.t list
+type 'a t = 'a list constraint 'a = _ No_plus.t
 
 let of_string s =
   String.split_on_char '+' s |>
