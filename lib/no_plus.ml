@@ -1,4 +1,4 @@
-type t = string
+type 'a t = string
 
 let of_string s =
   if String.contains s '+' then

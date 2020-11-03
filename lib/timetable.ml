@@ -2,10 +2,10 @@ type t = {
   activity_id: int;
   day: Day.t;
   hour: string;
-  students: Plus.t;
+  students: Class.t Plus.t;
   subject: string;
-  teachers: Plus.t;
-  activity_tags: Plus.t;
+  teachers: Teacher.t Plus.t;
+  activity_tags: Activities.Tag.t Plus.t;
   room: string;
   comments: string;
 }

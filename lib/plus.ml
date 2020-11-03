@@ -1,4 +1,4 @@
-type t = No_plus.t list
+type 'a t = 'a No_plus.t list
 
 let of_string s =
   String.split_on_char '+' s |>

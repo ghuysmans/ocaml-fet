@@ -22,7 +22,7 @@ let of_array = function
     failwith "Rooms_and_buildings.of_array"
 
 let to_array {name; capacity; building} = [|
-  Room.to_string name;
+  No_plus.to_string name;
   string_of_int capacity;
-  csv_of_option Building.to_string building
+  csv_of_option No_plus.to_string building
 |]

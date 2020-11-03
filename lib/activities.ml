@@ -1,10 +1,15 @@
 open Utils
 
+module Tag = struct
+  type t = [`Activity_tag] No_plus.t
+  let of_string = No_plus.of_string
+end
+
 type t = {
-  students: Plus.t;
+  students: Class.t Plus.t;
   subject: string;
-  teachers: Plus.t;
-  tags: Plus.t;
+  teachers: Teacher.t Plus.t;
+  tags: Tag.t Plus.t;
   duration: (int * int list) option;
   min_days: int option;
   weight: float option;

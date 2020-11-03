@@ -1,7 +1,7 @@
 type t = {
-  students: Plus.t;
+  students: Class.t Plus.t;
   subject: string;
-  teachers: Plus.t;
+  teachers: Teacher.t Plus.t;
   total_duration: int;
 }
 

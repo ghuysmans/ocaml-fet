@@ -1,8 +1,13 @@
+module Tag : sig
+  type t = [`Activity_tag] No_plus.t
+  val of_string : string -> t
+end
+
 type t = private {
-  students: Plus.t;
+  students: Class.t Plus.t;
   subject: string;
-  teachers: Plus.t;
-  tags: Plus.t;
+  teachers: Teacher.t Plus.t;
+  tags: Tag.t Plus.t;
   duration: (int * int list) option;
   min_days: int option;
   weight: float option;
@@ -10,9 +15,9 @@ type t = private {
 }
 
 val make :
-  ?students:Plus.t ->
-  ?teachers:Plus.t ->
-  ?tags:Plus.t ->
+  ?students:Class.t Plus.t ->
+  ?teachers:Teacher.t Plus.t ->
+  ?tags:Tag.t Plus.t ->
   ?duration:(int * int list) ->
   ?min_days:int ->
   ?weight:float ->

@@ -7,4 +7,4 @@ let of_array = function
   | _ -> failwith "Teachers.of_array"
 
 let to_array t =
-  [| Teacher.to_string t |]
+  [| No_plus.to_string t |]
