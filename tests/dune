@@ -1,0 +1,2 @@
+(executable (name import) (libraries fet) (modules import))
+(cram (deps import.exe activities.csv activity_tags.csv rooms_and_buildings.csv statistics_activities.csv students.csv subjects.csv teachers.csv timetable.csv))
