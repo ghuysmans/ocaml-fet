@@ -42,6 +42,7 @@ let ends_with suffix s =
   sub s (length s - length suffix) (length suffix) = suffix
 
 type data = {
+  rooms: Fet.Rooms_and_buildings.t list option;
   students: (Fet.Class.Group.t list * Fet.Class.Subgroup.t H.t) option;
   teachers: Fet.Teachers.t list option;
   timetable: Fet.Timetable.t list option;
@@ -51,7 +52,9 @@ let import input =
   match
     input |> List.fold_left (fun data x ->
       let read f = Csv.load x |> List.tl |> List.map f in
-      if x |> ends_with "students.csv" then
+      if x |> ends_with "rooms_and_buildings.csv" then
+        {data with rooms = Some (read Fet.Rooms_and_buildings.of_list)}
+      else if x |> ends_with "students.csv" then
         let h = H.create 100 in
         let groups = ref [] in
         let index = function
@@ -70,15 +73,17 @@ let import input =
         data
       )
     ) {
+      rooms = None;
       students = None;
       teachers = None;
       timetable = None;
     }
   with
+  | {rooms = None; _} -> failwith "missing rooms_and_buildings.csv"
   | {students = None; _} -> failwith "missing students.csv"
   | {teachers = None; _} -> failwith "missing teachers.csv"
   | {timetable = None; _} -> failwith "missing timetable.csv"
-  | {students = Some s; teachers = Some t; timetable = Some tt} -> s, t, tt
+  | {rooms = Some r; students = Some s; teachers = Some t; timetable = Some tt} -> r, s, t, tt
 
 let generate l =
   to_ics ([`Prodid (Params.empty, "ical_of_timetable")], l)
@@ -128,7 +133,7 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
     else
       None
   in
-  let (groups, subgroups), teachers, timetable = import input in
+  let rooms, (groups, subgroups), teachers, timetable = import input in
   let write fn l =
     let fn = Filename.concat output fn in
     let ch = open_out fn in
@@ -136,6 +141,27 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
     generate l |> output_string ch;
     close_out ch
   in
+  if g_rooms then (
+    rooms |> List.iter (fun Fet.Rooms_and_buildings.{name; _} ->
+      timetable |> List.map (fun (tt : Fet.Timetable.t) ->
+        if tt.room = name then
+          let start, doe = interval_of_timetable duration first tt in
+          let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
+          [mk_event
+            ~uid
+            ~location:tt.room
+            start
+            doe
+            ?freq
+            Fet.Plus.(to_string tt.teachers ^ " (" ^ to_string tt.students ^ ")")
+          ]
+        else
+          []
+      ) |>
+      List.flatten |>
+      write (name ^ ".ics")
+    )
+  );
   if g_teachers then (
     teachers |> List.iter (fun t ->
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
@@ -181,7 +207,6 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
     );
     ignore subgroups (* FIXME *)
   );
-  if g_rooms then failwith "TODO rooms";
   prerr_endline "done."
 
 
