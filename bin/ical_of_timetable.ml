@@ -137,7 +137,7 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
   let write fn l =
     let fn = Filename.concat output fn in
     let ch = open_out fn in
-    Printf.eprintf "writing %S..." fn;
+    Printf.eprintf "writing %S...\n" fn;
     generate l |> output_string ch;
     close_out ch
   in
