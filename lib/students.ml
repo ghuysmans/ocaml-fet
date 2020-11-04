@@ -31,3 +31,22 @@ let to_list = function
     [No_plus.to_string y; "0"; No_plus.to_string g; string_of_int pg; ""; ""]
   | Subgroup (y, g, sg, psg) ->
     [No_plus.to_string y; "0"; No_plus.to_string g; "0"; No_plus.to_string sg; string_of_int psg]
+
+type tree = (
+  Year.t * int * (
+    Group.t * int * (
+      Subgroup.t * int
+    ) list
+  ) list
+) list
+
+let tree_to_list l =
+  let s = No_plus.to_string in
+  let i = string_of_int in
+  List.map (fun (y, py, l) -> [s y; i py; ""; ""; ""; ""] :: (
+    List.map (fun (g, pg, l) -> [s y; i py; s g; i pg; ""; ""] :: (
+      List.map (fun (sg, psg) -> [s y; i py; s g; i pg; s sg; i psg]) l
+    )) l |>
+    List.flatten
+  )) l |>
+  List.flatten
