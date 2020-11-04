@@ -10,7 +10,7 @@ type t = {
   comments: string;
 }
 
-let headers = [|
+let headers = [
   "Activity Id";
   "Day";
   "Hour";
@@ -20,10 +20,10 @@ let headers = [|
   "Activity Tags";
   "Room";
   "Comments";
-|]
+]
 
-let of_array = function
-  | [| id; d; hour; st; subject; ts; at; room; comments |] -> {
+let of_list = function
+  | [id; d; hour; st; subject; ts; at; room; comments] -> {
     activity_id = int_of_string id;
     day = Day.of_string d;
     hour;
@@ -34,9 +34,9 @@ let of_array = function
     room;
     comments;
   }
-  | _ -> failwith "Timetable.of_array"
+  | _ -> failwith "Timetable.of_list"
 
-let to_array {activity_id; day; hour; students; subject; teachers; activity_tags; room; comments} = [|
+let to_list {activity_id; day; hour; students; subject; teachers; activity_tags; room; comments} = [
   string_of_int activity_id;
   Day.to_string day;
   hour;
@@ -46,4 +46,4 @@ let to_array {activity_id; day; hour; students; subject; teachers; activity_tags
   Plus.to_string activity_tags;
   room;
   comments;
-|]
+]

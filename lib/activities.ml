@@ -16,7 +16,7 @@ type t = {
   consecutive: bool option;
 }
 
-let headers = [|
+let headers = [
   "Students Sets";
   "Subject";
   "Teachers";
@@ -26,7 +26,7 @@ let headers = [|
   "Min Days";
   "Weight";
   "Consecutive";
-|]
+]
 
 let make ?(students=[]) ?(teachers=[]) ?(tags=[]) ?duration ?min_days ?weight ?consecutive subject =
   match duration with
@@ -43,8 +43,8 @@ let make ?(students=[]) ?(teachers=[]) ?(tags=[]) ?duration ?min_days ?weight ?c
     subject
   }
 
-let of_array = function
-  | [| st; subject; ts; at; td; sd; m; w; c |] ->
+let of_list = function
+  | [st; subject; ts; at; td; sd; m; w; c] ->
     make ~students:(Plus.of_string st)
          ~teachers:(Plus.of_string ts)
          ~tags:(Plus.of_string at)
@@ -65,9 +65,9 @@ let of_array = function
          ?weight:(option_of_csv float_of_string w)
          ?consecutive:(option_of_csv bool_of_string c)
          subject
-  | _ -> failwith "Activities.of_array"
+  | _ -> failwith "Activities.of_list"
 
-let to_array {students; subject; teachers; tags; duration; min_days; weight; consecutive} = [|
+let to_list {students; subject; teachers; tags; duration; min_days; weight; consecutive} = [
   Plus.to_string students;
   subject;
   Plus.to_string teachers;
@@ -86,4 +86,4 @@ let to_array {students; subject; teachers; tags; duration; min_days; weight; con
   csv_of_option string_of_int min_days;
   csv_of_option string_of_float weight;
   csv_of_option string_of_bool consecutive;
-|]
+]

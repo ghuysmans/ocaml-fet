@@ -25,6 +25,6 @@ val make :
   string ->
   t
 
-val headers : string array
-val of_array : string array -> t
-val to_array : t -> string array
+val headers : string list
+val of_list : string list -> t
+val to_list : t -> string list

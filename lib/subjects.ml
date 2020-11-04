@@ -1,10 +1,10 @@
 type t = string
 
-let headers = [| "Subject" |]
+let headers = ["Subject"]
 
-let of_array = function
-  | [| s |] -> s
-  | _ -> failwith "Subjects.of_array"
+let of_list = function
+  | [s] -> s
+  | _ -> failwith "Subjects.of_list"
 
-let to_array s =
-  [| s |]
+let to_list s =
+  [s]
