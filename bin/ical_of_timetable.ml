@@ -118,7 +118,7 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   | [start; stop] -> of_hour start, `End (of_hour stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk only weekly first duration g_teachers g_students g_rooms input output =
+let bulk only once first duration g_teachers g_students g_rooms input output =
   let filter s =
     match only with
     | None -> true
@@ -133,10 +133,10 @@ let bulk only weekly first duration g_teachers g_students g_rooms input output =
       | Some t -> t
   in
   let freq =
-    if weekly then
-      Some `Weekly
-    else
+    if once then
       None
+    else
+      Some `Weekly
   in
   let rooms, (groups, subgroups), teachers, timetable = import input in
   let write fn l =
