@@ -16,7 +16,7 @@ type t = {
   consecutive: bool option;
 }
 
-let headers = [
+let header = [
   "Students Sets";
   "Subject";
   "Teachers";

@@ -10,7 +10,7 @@ type t = {
   comments: string;
 }
 
-let headers = [
+let header = [
   "Activity Id";
   "Day";
   "Hour";

@@ -1,6 +1,6 @@
 type t = Activities.Tag.t
 
-let headers = ["Activity Tag"]
+let header = ["Activity Tag"]
 
 let of_list = function
   | [t] -> Activities.Tag.of_string t

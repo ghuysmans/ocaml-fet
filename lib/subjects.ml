@@ -1,6 +1,6 @@
 type t = string
 
-let headers = ["Subject"]
+let header = ["Subject"]
 
 let of_list = function
   | [s] -> s

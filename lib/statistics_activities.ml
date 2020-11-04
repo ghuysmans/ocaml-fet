@@ -5,7 +5,7 @@ type t = {
   total_duration: int;
 }
 
-let headers = [
+let header = [
   "Students Sets";
   "Subject";
   "Teachers";

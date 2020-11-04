@@ -1,6 +1,6 @@
 type t = Teacher.t
 
-let headers = ["Teacher"]
+let header = ["Teacher"]
 
 let of_list = function
   | [t] -> Teacher.of_string t
