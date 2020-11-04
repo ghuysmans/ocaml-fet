@@ -14,4 +14,4 @@ module Subgroup : sig
 end
 
 type t = [`Year | `Group | `Subgroup] No_plus.t
-val of_string : string -> t
+type 'a any = ([< `Year | `Group | `Subgroup] as 'a) No_plus.t

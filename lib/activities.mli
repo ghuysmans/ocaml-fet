@@ -15,7 +15,7 @@ type t = private {
 }
 
 val make :
-  ?students:Class.t Plus.t ->
+  ?students:'a Class.any Plus.t ->
   ?teachers:Teacher.t Plus.t ->
   ?tags:Tag.t Plus.t ->
   ?duration:(int * int list) ->

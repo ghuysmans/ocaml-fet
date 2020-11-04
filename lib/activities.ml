@@ -33,7 +33,7 @@ let make ?(students=[]) ?(teachers=[]) ?(tags=[]) ?duration ?min_days ?weight ?c
   | Some (t, l) when l <> [] && List.fold_left (+) 0 l <> t ->
     failwith "inconsistent Split Duration"
   | _ -> {
-    students;
+    students = (students :> Class.t Plus.t);
     teachers;
     tags;
     duration;

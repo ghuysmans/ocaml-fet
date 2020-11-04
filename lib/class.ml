@@ -14,4 +14,4 @@ module Subgroup = struct
 end
 
 type t = [`Year | `Group | `Subgroup] No_plus.t
-let of_string = No_plus.of_string
+type 'a any = ([< `Year | `Group | `Subgroup] as 'a) No_plus.t
