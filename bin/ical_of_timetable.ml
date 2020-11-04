@@ -148,7 +148,7 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
             start
             doe
             ?freq
-            (tt.subject ^ ", " ^ Fet.Plus.to_string tt.students)
+            (Fet.Plus.to_string tt.students ^ " (" ^ tt.subject ^ ")")
           ]
         else
           []
