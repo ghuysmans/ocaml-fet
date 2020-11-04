@@ -118,7 +118,12 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   | [start; stop] -> of_hour start, `End (of_hour stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk weekly first duration g_teachers g_students g_rooms input output =
+let bulk only weekly first duration g_teachers g_students g_rooms input output =
+  let filter s =
+    match only with
+    | None -> true
+    | Some o -> o = s
+  in
   let first =
     match first with
     | Some f -> f
@@ -135,7 +140,10 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
   in
   let rooms, (groups, subgroups), teachers, timetable = import input in
   let write fn l =
-    let fn = Filename.concat output fn in
+    let fn =
+      Str.(global_replace (regexp_string "/") "_") fn |>
+      Filename.concat output
+    in
     let ch = open_out fn in
     Printf.eprintf "writing %S...\n" fn;
     generate l |> output_string ch;
@@ -159,7 +167,10 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
           []
       ) |>
       List.flatten |>
-      write (name ^ ".ics")
+      if filter name then
+        write (name ^ ".ics")
+      else
+        ignore
     )
   );
   if g_teachers then (
@@ -180,7 +191,10 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
           []
       ) |>
       List.flatten |>
-      write (Fet.No_plus.to_string t ^ ".ics")
+      if filter (Fet.No_plus.to_string t) then
+        write (Fet.No_plus.to_string t ^ ".ics")
+      else
+        ignore
     )
   );
   if g_students then (
@@ -203,7 +217,10 @@ let bulk weekly first duration g_teachers g_students g_rooms input output =
           []
       ) |>
       List.flatten |>
-      write (Fet.No_plus.to_string g ^ ".ics")
+      if filter (Fet.No_plus.to_string g) then
+        write (Fet.No_plus.to_string g ^ ".ics")
+      else
+        ignore
     );
     ignore subgroups (* FIXME *)
   );
@@ -248,7 +265,11 @@ let once =
 
 let output =
   let doc = "output directory" in
-  Arg.(required & opt (some dir) None & info ~doc ["o"; "output"])
+  Arg.(value & opt dir "." & info ~doc ["output-dir"])
+
+let only =
+  let doc = "generate a single schedule" in
+  Arg.(value & opt (some string) None & info ~doc ["only"])
 
 let input =
   Arg.(non_empty & pos_all file [] & info ~docv:"CSV" [])
@@ -256,6 +277,6 @@ let input =
 let () =
   let open Term in
   exit @@ eval (
-    const bulk $ once $ first $ duration $ teachers $ students $ rooms $ input $ output,
-    info "ical_of_timetable" ~doc:"generate iCal schedules from FET CSV files"
+    const bulk $ only $ once $ first $ duration $ teachers $ students $ rooms $ input $ output,
+    info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
   )
