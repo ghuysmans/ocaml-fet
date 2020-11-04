@@ -1,7 +1,7 @@
 open Utils
 
 type t = {
-  name: Room.t;
+  name: string;
   capacity: int;
   building: Building.t option;
 }
@@ -13,8 +13,8 @@ let header = [
 ]
 
 let of_list = function
-  | [r; c; b] -> {
-    name = Room.of_string r;
+  | [name; c; b] -> {
+    name;
     capacity = int_of_string c;
     building = option_of_csv Building.of_string b
   }
@@ -22,7 +22,7 @@ let of_list = function
     failwith "Rooms_and_buildings.of_list"
 
 let to_list {name; capacity; building} = [
-  No_plus.to_string name;
+  name;
   string_of_int capacity;
   csv_of_option No_plus.to_string building
 ]
