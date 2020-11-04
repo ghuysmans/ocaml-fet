@@ -30,7 +30,7 @@ let headers = [
 
 let make ?(students=[]) ?(teachers=[]) ?(tags=[]) ?duration ?min_days ?weight ?consecutive subject =
   match duration with
-  | Some (t, l) when List.fold_left (+) 0 l <> t ->
+  | Some (t, l) when l <> [] && List.fold_left (+) 0 l <> t ->
     failwith "inconsistent Split Duration"
   | _ -> {
     students;
