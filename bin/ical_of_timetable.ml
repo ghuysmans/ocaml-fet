@@ -92,7 +92,10 @@ let import input =
   | {rooms = Some r; students = Some s; teachers = Some t; timetable = Some tt} -> r, s, t, tt
 
 let generate l =
-  to_ics ([`Prodid (Params.empty, "ical_of_timetable")], l)
+  to_ics ([
+    `Prodid (Params.empty, "ical_of_timetable");
+    `Version (Params.empty, "2.0");
+  ], l)
 
 let add_span t span =
   match Ptime.add_span t span with

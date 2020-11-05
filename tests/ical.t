@@ -8,6 +8,7 @@
   $ grep -v DTSTAMP 3info.ics
   BEGIN:VCALENDAR
   PRODID:ical_of_timetable
+  VERSION:2.0
   BEGIN:VEVENT
   UID:2
   DTSTART:20201109T110000
@@ -20,6 +21,7 @@
   $ grep -v DTSTAMP 3socio.ics
   BEGIN:VCALENDAR
   PRODID:ical_of_timetable
+  VERSION:2.0
   BEGIN:VEVENT
   UID:1
   DTSTART:20201113T110000
