@@ -1,9 +1,7 @@
-open Utils
-
 type t = {
-  name: string;
+  name: string; (* FIXME not empty? *)
   capacity: int;
-  building: Building.t option;
+  building: string; (* FIXME option? *)
 }
 
 let header = [
@@ -13,10 +11,10 @@ let header = [
 ]
 
 let of_list = function
-  | [name; c; b] -> {
+  | [name; c; building] -> {
     name;
     capacity = int_of_string c;
-    building = option_of_csv Building.of_string b
+    building;
   }
   | _ ->
     failwith "Rooms_and_buildings.of_list"
@@ -24,5 +22,5 @@ let of_list = function
 let to_list {name; capacity; building} = [
   name;
   string_of_int capacity;
-  csv_of_option No_plus.to_string building
+  building;
 ]
