@@ -1,0 +1,16 @@
+opam-version: "2.0"
+name: "fet"
+version: "0.0.1"
+maintainer: "Guillaume Huysmans <ghuysmans99@gmail.com>"
+authors: "Guillaume Huysmans <ghuysmans99@gmail.com>"
+homepage: "https://github.com/ghuysmans/ocaml-fet/"
+bug-reports: "https://github.com/ghuysmans/ocaml-fet/issues"
+dev-repo: "git+https://github.com/ghuysmans/ocaml-fet/"
+build: [["dune" "build" "-p" name "-j" jobs]]
+depends: [
+  "dune"
+  "csv"
+  "icalendar"
+  "cmdliner"
+]
+synopsis: "FET CSV reader/writer and iCalendar generator"
