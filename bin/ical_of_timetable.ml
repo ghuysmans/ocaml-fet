@@ -124,7 +124,7 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   | [start; stop] -> of_hour start, `End (of_hour stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk only once first duration g_teachers g_students g_rooms input output =
+let bulk only once first duration g_teachers show_classes g_students g_rooms input output =
   let filter s =
     match only with
     | None -> true
@@ -214,9 +214,12 @@ let bulk only once first duration g_teachers g_students g_rooms input output =
         start
         doe
         ?freq
-        (match tt.teachers with
-         | [] -> tt.subject
-         | l -> tt.subject ^ ", " ^ Fet.Plus.to_string l)
+        (if show_classes then
+           tt.subject ^ " " ^ Fet.Plus.to_string tt.students
+         else
+           match tt.teachers with
+           | [] -> tt.subject
+           | l -> tt.subject ^ ", " ^ Fet.Plus.to_string l)
     in
     let group_cals = H.create 100 in
     groups |> List.iter (fun g ->
@@ -299,12 +302,16 @@ let only =
   let doc = "generate a single schedule" in
   Arg.(value & opt (some string) None & info ~doc ["only"])
 
+let show_classes =
+  let doc = "show classes in student schedules" in
+  Arg.(value & flag & info ~doc ["c"; "show-classes"])
+
 let input =
   Arg.(non_empty & pos_all file [] & info ~docv:"CSV" [])
 
 let () =
   let open Term in
   exit @@ eval (
-    const bulk $ only $ once $ first $ duration $ teachers $ students $ rooms $ input $ output,
+    const bulk $ only $ once $ first $ duration $ teachers $ show_classes $ students $ rooms $ input $ output,
     info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
   )
