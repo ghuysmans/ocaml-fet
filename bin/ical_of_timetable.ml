@@ -103,7 +103,7 @@ let add_span t span =
   | None -> failwith "Ptime.add_span"
   | Some t -> t
 
-let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
+let interval_of_timetable default_duration fst (tt : Fet.Timetable.t) =
   let d =
     match tt.day with
     | Monday -> 0
@@ -114,19 +114,22 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
     | Saturday -> 5
     | Sunday -> 6
   in
-  let of_hour h =
-    Scanf.sscanf h "%d:%d" (fun h m ->
-      d * 24 * 60 * 60 +
-      h * 60 * 60 +
-      m * 60
-    ) |>
+  let open Re in
+  let conv g =
+    let i i = Group.get g i |> int_of_string in
+    (  d * 24 * 60 * 60 +
+     i 1 * 60 * 60 +
+     i 2 * 60) |>
     Ptime.Span.of_int_s |>
-    add_span first
+    add_span fst
   in
-  match String.split_on_char '-' tt.hour with
+  match
+    let n = rep1 (rg '0' '9') in
+    all (compile (seq [group n; set ".:h"; group n])) tt.hour
+  with
   | [] -> assert false
-  | [h] -> of_hour h, `Minutes default_duration
-  | [start; stop] -> of_hour start, `End (of_hour stop)
+  | [start] -> conv start, `Minutes default_duration
+  | [start; stop] -> conv start, `End (conv stop)
   | _ -> failwith "invalid Hour range format"
 
 let bulk tz only once first duration g_teachers show_classes g_students g_rooms input output =
