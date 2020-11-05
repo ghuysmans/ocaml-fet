@@ -94,6 +94,11 @@ let import input =
 let generate l =
   to_ics ([`Prodid (Params.empty, "ical_of_timetable")], l)
 
+let add_span t span =
+  match Ptime.add_span t span with
+  | None -> failwith "Ptime.add_span"
+  | Some t -> t
+
 let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   let d =
     match tt.day with
@@ -107,16 +112,12 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   in
   let of_hour h =
     Scanf.sscanf h "%d:%d" (fun h m ->
-      float d *. 24. *. 60. *. 60. +.
-      float h *. 60. *. 60. +.
-      float m *. 60.
+      d * 24 * 60 * 60 +
+      h * 60 * 60 +
+      m * 60
     ) |>
-    Ptime.Span.of_float_s |> function
-      | None -> failwith "Ptime.Span.of_float_s"
-      | Some s ->
-        match Ptime.add_span first s with
-        | None -> failwith "Ptime.add_span"
-        | Some t -> t
+    Ptime.Span.of_int_s |>
+    add_span first
   in
   match String.split_on_char '-' tt.hour with
   | [] -> assert false
@@ -131,12 +132,25 @@ let bulk only once first duration g_teachers show_classes g_students g_rooms inp
     | Some o -> o = s
   in
   let first =
-    match first with
-    | Some f -> f
-    | None ->
-      match Ptime.(to_date generation_time |> of_date) with
-      | None -> failwith "Ptime.of_date"
-      | Some t -> t
+    let t =
+      match first with
+      | Some f -> f
+      | None ->
+        match Ptime.(to_date generation_time |> of_date) with
+        | None -> failwith "Ptime.of_date"
+        | Some t -> t
+    in
+    let dd =
+      match Ptime.weekday t with
+      | `Mon -> 0
+      | `Tue -> 6
+      | `Wed -> 5
+      | `Thu -> 4
+      | `Fri -> 3
+      | `Sat -> 2
+      | `Sun -> 1
+    in
+    add_span t (Ptime.Span.of_int_s (dd * 24 * 60 * 60))
   in
   let freq =
     if once then
@@ -275,7 +289,7 @@ let date =
   )
 
 let first =
-  let doc = "first Monday (default: today)" in (* FIXME *)
+  let doc = "first day" in
   Arg.(value & opt (some date) None & info ~doc ["f"; "first-day"])
 
 let teachers =
