@@ -168,7 +168,7 @@ let bulk tz only once first duration g_teachers show_classes g_students g_rooms 
   let rooms, (groups, subgroups), teachers, timetable = import input in
   let write fn l =
     let fn =
-      Str.(global_replace (regexp_string "/") "_") fn |>
+      Re.(replace_string (compile (char '/')) ~by:"_") fn |>
       Filename.concat output
     in
     let ch = open_out fn in
