@@ -1,1 +1,1 @@
-(executable (public_name ical_of_timetable) (libraries fet icalendar cmdliner str))
+(executable (public_name ical_of_timetable) (libraries fet icalendar cmdliner str unix))
