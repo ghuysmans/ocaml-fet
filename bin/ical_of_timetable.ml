@@ -75,7 +75,7 @@ let import input =
       else if x |> ends_with "timetable.csv" then
         {data with timetable = Some (read Fet.Timetable.of_list)}
       else (
-        Printf.eprintf "ignored %S.\n" x;
+        Printf.eprintf "ignored: %s\n" x;
         data
       )
     ) {
@@ -172,7 +172,7 @@ let bulk tz only once first duration g_teachers show_classes g_students g_rooms 
       Filename.concat output
     in
     let ch = open_out fn in
-    Printf.eprintf "writing %S...\n" fn;
+    Printf.printf "%s\n" fn;
     generate tz l |> output_string ch;
     close_out ch
   in
@@ -275,8 +275,7 @@ let bulk tz only once first duration g_teachers show_classes g_students g_rooms 
       else
         ignore
     )
-  );
-  prerr_endline "done."
+  )
 
 
 open Cmdliner
