@@ -91,10 +91,11 @@ let import input =
   | {timetable = None; _} -> failwith "missing timetable.csv"
   | {rooms = Some r; students = Some s; teachers = Some t; timetable = Some tt} -> r, s, t, tt
 
-let generate l =
+let generate tz l =
   to_ics ([
     `Prodid (Params.empty, "ical_of_timetable");
     `Version (Params.empty, "2.0");
+    `Xprop (("WR", "TIMEZONE"), Params.empty, tz);
   ], l)
 
 let add_span t span =
@@ -128,7 +129,7 @@ let interval_of_timetable default_duration first (tt : Fet.Timetable.t) =
   | [start; stop] -> of_hour start, `End (of_hour stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk only once first duration g_teachers show_classes g_students g_rooms input output =
+let bulk tz only once first duration g_teachers show_classes g_students g_rooms input output =
   let filter s =
     match only with
     | None -> true
@@ -169,7 +170,7 @@ let bulk only once first duration g_teachers show_classes g_students g_rooms inp
     in
     let ch = open_out fn in
     Printf.eprintf "writing %S...\n" fn;
-    generate l |> output_string ch;
+    generate tz l |> output_string ch;
     close_out ch
   in
   if g_rooms then (
@@ -323,12 +324,16 @@ let show_classes =
   let doc = "show classes in student schedules" in
   Arg.(value & flag & info ~doc ["c"; "show-classes"])
 
+let tz =
+  let doc = "timezone" in
+  Arg.(value & opt string "Europe/Brussels" & info ~doc ["T"; "timezone"])
+
 let input =
   Arg.(non_empty & pos_all file [] & info ~docv:"CSV" [])
 
 let () =
   let open Term in
   exit @@ eval (
-    const bulk $ only $ once $ first $ duration $ teachers $ show_classes $ students $ rooms $ input $ output,
+    const bulk $ tz $ only $ once $ first $ duration $ teachers $ show_classes $ students $ rooms $ input $ output,
     info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
   )
