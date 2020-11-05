@@ -36,6 +36,12 @@ module H = Hashtbl.Make (struct
   let equal = (=)
 end)
 
+module HS = Hashtbl.Make (struct
+  type t = Fet.Class.Subgroup.t
+  let hash = Hashtbl.hash
+  let equal = (=)
+end)
+
 let ends_with suffix s =
   let open String in
   length s >= length suffix &&
@@ -43,7 +49,7 @@ let ends_with suffix s =
 
 type data = {
   rooms: Fet.Rooms_and_buildings.t list option;
-  students: (Fet.Class.Group.t list * Fet.Class.Subgroup.t H.t) option;
+  students: (Fet.Class.Group.t list * Fet.Class.Group.t HS.t) option;
   teachers: Fet.Teachers.t list option;
   timetable: Fet.Timetable.t list option;
 }
@@ -55,12 +61,12 @@ let import input =
       if x |> ends_with "rooms_and_buildings.csv" then
         {data with rooms = Some (read Fet.Rooms_and_buildings.of_list)}
       else if x |> ends_with "students.csv" then
-        let h = H.create 100 in
+        let h = HS.create 100 in
         let groups = ref [] in
         let index = function
           | Fet.Students.Year _ -> ()
           | Group (_, g, _) -> groups := g :: !groups
-          | Subgroup (_, g, sg, _) -> H.add h g sg
+          | Subgroup (_, g, sg, _) -> HS.add h sg g
         in
         read Fet.Students.of_list |> List.iter index;
         {data with students = Some (!groups, h)}
@@ -198,31 +204,53 @@ let bulk only once first duration g_teachers g_students g_rooms input output =
     )
   );
   if g_students then (
+    (* FIXME what about years? *)
+    let student_view (tt : Fet.Timetable.t) =
+      let start, doe = interval_of_timetable duration first tt in
+      let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
+      mk_event
+        ~uid
+        ~location:tt.room
+        start
+        doe
+        ?freq
+        (match tt.teachers with
+         | [] -> tt.subject
+         | l -> tt.subject ^ ", " ^ Fet.Plus.to_string l)
+    in
+    let group_cals = H.create 100 in
     groups |> List.iter (fun g ->
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
         if List.mem (g :> Fet.Class.t) tt.students then
-          let start, doe = interval_of_timetable duration first tt in
-          let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
-          [mk_event
-            ~uid
-            ~location:tt.room
-            start
-            doe
-            ?freq
-            (match tt.teachers with
-             | [] -> tt.subject
-             | l -> tt.subject ^ ", " ^ Fet.Plus.to_string l)
-          ]
+          [student_view tt]
         else
           []
       ) |>
-      List.flatten |>
+      List.flatten |> fun l ->
       if filter (Fet.No_plus.to_string g) then
-        write (Fet.No_plus.to_string g ^ ".ics")
+        write (Fet.No_plus.to_string g ^ ".ics") l;
+      H.replace group_cals g l
+    );
+    HS.fold (fun sg _ l -> sg :: l) subgroups [] |>
+    List.sort_uniq compare |>
+    List.iter (fun sg ->
+      let from_groups =
+        HS.find_all subgroups sg |>
+        List.map (H.find group_cals) |>
+        List.flatten
+      in
+      (* TODO fold_right elsewhere? *)
+      List.fold_right (fun (tt : Fet.Timetable.t) l ->
+        if List.mem (sg :> Fet.Class.t) tt.students then
+          student_view tt :: l
+        else
+          l
+      ) timetable from_groups |>
+      if filter (Fet.No_plus.to_string sg) then
+        write (Fet.No_plus.to_string sg ^ ".ics")
       else
         ignore
-    );
-    ignore subgroups (* FIXME *)
+    )
   );
   prerr_endline "done."
 
