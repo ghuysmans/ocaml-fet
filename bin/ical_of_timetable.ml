@@ -132,7 +132,7 @@ let interval_of_timetable default_duration fst (tt : Fet.Timetable.t) =
   | [start; stop] -> conv start, `End (conv stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk tz only once first duration g_teachers show_classes g_students g_rooms input output =
+let bulk tz only once first duration g_teachers show_classes nog nosg g_students g_rooms input output =
   let filter s =
     match only with
     | None -> true
@@ -251,7 +251,7 @@ let bulk tz only once first duration g_teachers show_classes g_students g_rooms 
           []
       ) |>
       List.flatten |> fun l ->
-      if filter (Fet.No_plus.to_string g) then
+      if filter (Fet.No_plus.to_string g) && not nog then
         write (Fet.No_plus.to_string g ^ ".ics") l;
       H.replace group_cals g l
     );
@@ -270,7 +270,7 @@ let bulk tz only once first duration g_teachers show_classes g_students g_rooms 
         else
           l
       ) timetable from_groups |>
-      if filter (Fet.No_plus.to_string sg) then
+      if filter (Fet.No_plus.to_string sg) && not nosg then
         write (Fet.No_plus.to_string sg ^ ".ics")
       else
         ignore
@@ -326,6 +326,14 @@ let show_classes =
   let doc = "show classes in student schedules" in
   Arg.(value & flag & info ~doc ["c"; "show-classes"])
 
+let no_groups =
+  let doc = "don't generate group schedules" in
+  Arg.(value & flag & info ~doc ["no-groups"])
+
+let no_subgroups =
+  let doc = "don't generate subgroup schedules" in
+  Arg.(value & flag & info ~doc ["no-subgroups"])
+
 let tz =
   let doc = "timezone" in
   Arg.(value & opt string "Europe/Brussels" & info ~doc ["T"; "timezone"])
@@ -336,6 +344,6 @@ let input =
 let () =
   let open Term in
   exit @@ eval (
-    const bulk $ tz $ only $ once $ first $ duration $ teachers $ show_classes $ students $ rooms $ input $ output,
+    const bulk $ tz $ only $ once $ first $ duration $ teachers $ show_classes $ no_groups $ no_subgroups $ students $ rooms $ input $ output,
     info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
   )
