@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "fet"
-version: "0.0.1"
+version: "dev"
 maintainer: "Guillaume Huysmans <ghuysmans99@gmail.com>"
 authors: "Guillaume Huysmans <ghuysmans99@gmail.com>"
 homepage: "https://github.com/ghuysmans/ocaml-fet/"
