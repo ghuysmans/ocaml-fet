@@ -6,9 +6,9 @@ let generation_time =
   | Some t -> t
 
 (* FIXME lang? *)
-let mk_event ~uid ~location start doe ?freq ?description summary = `Event {
+let mk_event ~id ~location start doe ?freq ?description summary = `Event {
   dtstamp = Params.empty, generation_time;
-  uid = Params.empty, uid;
+  uid = Params.empty, string_of_int id; (* FIXME *)
   dtstart = Params.empty, `Datetime (`Local start);
   dtend_or_duration = Some (
     match doe with
@@ -188,9 +188,8 @@ let bulk tz only duration
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
         if tt.room = name then
           let start, doe = interval_of_timetable duration first tt in
-          let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
           [mk_event
-            ~uid
+            ~id:tt.activity_id
             ~location:tt.room
             start
             doe
@@ -212,9 +211,8 @@ let bulk tz only duration
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
         if List.mem t tt.teachers then
           let start, doe = interval_of_timetable duration first tt in
-          let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
           [mk_event
-            ~uid
+            ~id:tt.activity_id
             ~location:tt.room
             start
             doe
@@ -235,9 +233,8 @@ let bulk tz only duration
     (* FIXME what about years? *)
     let student_view (tt : Fet.Timetable.t) =
       let start, doe = interval_of_timetable duration first tt in
-      let uid = string_of_int tt.activity_id in (* FIXME how unique? *)
       mk_event
-        ~uid
+        ~id:tt.activity_id
         ~location:tt.room
         start
         doe
