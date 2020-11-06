@@ -18,7 +18,10 @@ let mk_event ~uid ~location start doe ?freq ?description summary = `Event {
   rrule = (
     match freq with
     | None -> None
-    | Some f -> Some (Params.empty, (f, None, None, []))
+    | Some (f, None) ->
+      Some (Params.empty, (f, None, None, []))
+    | Some (f, Some last) ->
+      Some (Params.empty, (f, Some (`Until (`Local last)), None, []))
   );
   props = (
     `Location (Params.empty, location) ::
@@ -132,7 +135,12 @@ let interval_of_timetable default_duration fst (tt : Fet.Timetable.t) =
   | [start; stop] -> conv start, `End (conv stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk tz only once first duration g_teachers show_classes nog nosg g_students g_rooms input output =
+let bulk tz only duration
+         first until
+         g_teachers
+         show_classes nog nosg g_students
+         g_rooms
+         input output =
   let filter s =
     match only with
     | None -> true
@@ -160,10 +168,9 @@ let bulk tz only once first duration g_teachers show_classes nog nosg g_students
     add_span t (Ptime.Span.of_int_s (dd * 24 * 60 * 60))
   in
   let freq =
-    if once then
-      None
-    else
-      Some `Weekly
+    match until with
+    | None -> None
+    | Some d -> Some (`Weekly, Some d)
   in
   let rooms, (groups, subgroups), teachers, timetable = import input in
   let write fn l =
@@ -298,6 +305,10 @@ let first =
   let doc = "start from a given date" in
   Arg.(value & opt (some date) None & info ~doc ["from"])
 
+let until =
+  let doc = "repeat events weekly before a given date" in
+  Arg.(value & opt (some date) None & info ~doc ["u"; "until"; "repeat-until"])
+
 let teachers =
   let doc = "generate teacher schedules" in
   Arg.(value & flag & info ~doc ["t"; "teachers"])
@@ -309,10 +320,6 @@ let students =
 let rooms =
   let doc = "generate room schedules" in
   Arg.(value & flag & info ~doc ["r"; "rooms"])
-
-let once =
-  let doc = "don't repeat courses weekly" in
-  Arg.(value & flag & info ~doc ["1"; "once"])
 
 let output =
   let doc = "output directory" in
@@ -344,6 +351,12 @@ let input =
 let () =
   let open Term in
   exit @@ eval (
-    const bulk $ tz $ only $ once $ first $ duration $ teachers $ show_classes $ no_groups $ no_subgroups $ students $ rooms $ input $ output,
+    const bulk $
+      tz $ only $ duration $
+      first $ until $
+      teachers $
+      show_classes $ no_groups $ no_subgroups $ students $
+      rooms $
+      input $ output,
     info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
   )
