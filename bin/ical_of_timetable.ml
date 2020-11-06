@@ -295,8 +295,8 @@ let date =
   )
 
 let first =
-  let doc = "first day" in
-  Arg.(value & opt (some date) None & info ~doc ["f"; "first-day"])
+  let doc = "start from a given date" in
+  Arg.(value & opt (some date) None & info ~doc ["from"])
 
 let teachers =
   let doc = "generate teacher schedules" in

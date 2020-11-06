@@ -1,4 +1,4 @@
-  $ ../bin/ical_of_timetable.exe --students *.csv 2>&1 |grep -v ignored
+  $ ../bin/ical_of_timetable.exe --students --from 2020-11-06 *.csv 2>&1 |grep -v ignored
   ./3info.ics
   ./3socio.ics
   ./gui.ics
