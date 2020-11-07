@@ -1,7 +1,7 @@
 on: [push, pull_request]
 name: CI
 jobs:
-  test:
+  build:
     strategy:
       fail-fast: false
       matrix:
@@ -25,15 +25,17 @@ jobs:
       - run: opam pin add fet.dev . --no-action
       - run: opam install . --deps-only --with-doc --with-test
       - run: opam exec -- dune build bin/ical_of_timetable.exe
-      - run: opam exec -- dune runtest
-      - name: Upload artifact
+      - name: Test
+        if: matrix.os != 'windows-latest' #FIXME?
+        run: opam exec -- dune runtest
+      - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
           name: ${{ matrix.ocaml-version }}_${{ matrix.os }}
           path: _build
   release:
     runs-on: windows-latest
-    needs: test
+    needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Download artifact
