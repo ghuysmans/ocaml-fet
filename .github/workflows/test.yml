@@ -42,6 +42,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: 4.08.1_windows-latest
+          path: _build
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
