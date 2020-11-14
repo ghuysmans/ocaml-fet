@@ -9,7 +9,7 @@ NAME
        from FET
 
 SYNOPSIS
-       ical_of_timetable [OPTION]... CSV...
+       ical_of_timetable [OPTION]... timetable.csv
 
 OPTIONS
        -c, --show-classes

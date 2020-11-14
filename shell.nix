@@ -7,6 +7,8 @@ stdenv.mkDerivation {
     dune_2
     findlib
     lablgtk3
+    ptime
+    cmdliner
     vim
   ];
   #for grep!

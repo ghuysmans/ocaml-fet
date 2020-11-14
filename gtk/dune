@@ -1,1 +1,1 @@
-(executable (name main) (libraries lablgtk3))
+(executable (name main) (libraries spec lablgtk3))

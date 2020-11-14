@@ -1,10 +1,4 @@
-type date = {
-  day: int;
-  month: int;
-  year: int;
-}
-
-type t = GEdit.combo_box * date option ref
+type t = GEdit.combo_box * Spec.date option ref
 
 let combo_box ~parent ~empty ~set ~title ~ok ~cancel ~fmt =
   let v = ref None in
@@ -36,10 +30,10 @@ let combo_box ~parent ~empty ~set ~title ~ok ~cancel ~fmt =
     else (
       (match dialog#run () with
        | `OK ->
-         let t = {day = cal#day; month = cal#month; year = cal#year} in
+         let t = cal#day, cal#month, cal#year in
          v := Some t;
          let row = model#get_iter (GTree.Path.create [1]) in
-         model#set ~row ~column (Printf.sprintf fmt t.day t.month t.year);
+         model#set ~row ~column (Printf.sprintf fmt cal#day cal#month cal#year);
        | `CANCEL ->
          v := None;
          combo#set_active 0

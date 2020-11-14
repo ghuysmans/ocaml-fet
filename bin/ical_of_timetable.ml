@@ -45,54 +45,30 @@ module HS = Hashtbl.Make (struct
   let equal = (=)
 end)
 
-let ends_with suffix s =
-  let open String in
-  length s >= length suffix &&
-  sub s (length s - length suffix) (length suffix) = suffix
-
-type data = {
-  rooms: Fet.Rooms_and_buildings.t list option;
-  students: (Fet.Class.Group.t list * Fet.Class.Group.t HS.t) option;
-  teachers: Fet.Teachers.t list option;
-  timetable: Fet.Timetable.t list option;
-}
-
-let import input =
-  match
-    input |> List.fold_left (fun data x ->
-      let read f = Csv.load x |> List.tl |> List.map f in
-      if x |> ends_with "rooms_and_buildings.csv" then
-        {data with rooms = Some (read Fet.Rooms_and_buildings.of_list)}
-      else if x |> ends_with "students.csv" then
-        let h = HS.create 100 in
-        let groups = ref [] in
-        let index = function
-          | Fet.Students.Year _ -> ()
-          | Group (_, g, _) -> groups := g :: !groups
-          | Subgroup (_, g, sg, _) -> HS.add h sg g
-        in
-        read Fet.Students.of_list |> List.iter index;
-        {data with students = Some (!groups, h)}
-      else if x |> ends_with "teachers.csv" then
-        {data with teachers = Some (read Fet.Teachers.of_list)}
-      else if x |> ends_with "timetable.csv" then
-        {data with timetable = Some (read Fet.Timetable.of_list)}
-      else (
-        Printf.eprintf "ignored: %s\n" x;
-        data
-      )
-    ) {
-      rooms = None;
-      students = None;
-      teachers = None;
-      timetable = None;
-    }
-  with
-  | {rooms = None; _} -> failwith "missing rooms_and_buildings.csv"
-  | {students = None; _} -> failwith "missing students.csv"
-  | {teachers = None; _} -> failwith "missing teachers.csv"
-  | {timetable = None; _} -> failwith "missing timetable.csv"
-  | {rooms = Some r; students = Some s; teachers = Some t; timetable = Some tt} -> r, s, t, tt
+let import timetable =
+  let prefix =
+    match Spec.prefix ~timetable with
+    | Some p -> p
+    | None -> failwith "unsupported filename"
+  in
+  let read f name =
+    Filename.(concat (dirname timetable) (prefix ^ name)) |>
+    Csv.load |>
+    List.tl |> (* skip the header *)
+    List.map f
+  in
+  read Fet.Rooms_and_buildings.of_list "rooms_and_buildings.csv",
+  read Fet.Teachers.of_list "teachers.csv",
+  read Fet.Timetable.of_list "timetable.csv",
+  let h = HS.create 100 in
+  let groups = ref [] in
+  let index = function
+    | Fet.Students.Year _ -> ()
+    | Group (_, g, _) -> groups := g :: !groups
+    | Subgroup (_, g, sg, _) -> HS.add h sg g
+  in
+  read Fet.Students.of_list "students.csv" |> List.iter index;
+  !groups, h
 
 let generate tz l =
   to_ics ([
@@ -135,25 +111,17 @@ let interval_of_timetable default_duration fst (tt : Fet.Timetable.t) =
   | [start; stop] -> conv start, `End (conv stop)
   | _ -> failwith "invalid Hour range format"
 
-let bulk tz only duration
-         first until
-         g_teachers
-         show_classes nog nosg g_students
-         g_rooms
-         input output =
+let bulk (t : Spec.t) =
   let filter s =
-    match only with
+    match t.only with
     | None -> true
     | Some o -> o = s
   in
   let first =
     let t =
-      match first with
-      | Some f -> f
-      | None ->
-        match Ptime.(to_date generation_time |> of_date) with
-        | None -> failwith "Ptime.of_date"
-        | Some t -> t
+      match t.first with
+      | Some f -> Spec.ptime_of_date f
+      | None -> Spec.ptime_of_date (Ptime.to_date generation_time)
     in
     let dd =
       match Ptime.weekday t with
@@ -168,26 +136,26 @@ let bulk tz only duration
     add_span t (Ptime.Span.of_int_s (dd * 24 * 60 * 60))
   in
   let freq =
-    match until with
+    match t.until with
     | None -> None
-    | Some d -> Some (`Weekly, Some d)
+    | Some d -> Some (`Weekly, Some (Spec.ptime_of_date d))
   in
-  let rooms, (groups, subgroups), teachers, timetable = import input in
+  let rooms, teachers, timetable, (groups, subgroups) = import t.input in
   let write fn l =
     let fn =
       Re.(replace_string (compile (char '/')) ~by:"_") fn |>
-      Filename.concat output
+      Filename.concat t.output_dir
     in
     let ch = open_out fn in
     Printf.printf "%s\n" fn;
-    generate tz l |> output_string ch;
+    generate t.timezone l |> output_string ch;
     close_out ch
   in
-  if g_rooms then (
+  if t.generate_rooms then (
     rooms |> List.iter (fun Fet.Rooms_and_buildings.{name; _} ->
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
         if tt.room = name then
-          let start, doe = interval_of_timetable duration first tt in
+          let start, doe = interval_of_timetable t.slot_duration first tt in
           [mk_event
             ~id:tt.activity_id
             ~location:tt.room
@@ -206,11 +174,11 @@ let bulk tz only duration
         ignore
     )
   );
-  if g_teachers then (
-    teachers |> List.iter (fun t ->
+  if t.generate_teachers then (
+    teachers |> List.iter (fun teacher ->
       timetable |> List.map (fun (tt : Fet.Timetable.t) ->
-        if List.mem t tt.teachers then
-          let start, doe = interval_of_timetable duration first tt in
+        if List.mem teacher tt.teachers then
+          let start, doe = interval_of_timetable t.slot_duration first tt in
           [mk_event
             ~id:tt.activity_id
             ~location:tt.room
@@ -223,23 +191,23 @@ let bulk tz only duration
           []
       ) |>
       List.flatten |>
-      if filter (Fet.No_plus.to_string t) then
-        write (Fet.No_plus.to_string t ^ ".ics")
+      if filter (Fet.No_plus.to_string teacher) then
+        write (Fet.No_plus.to_string teacher ^ ".ics")
       else
         ignore
     )
   );
-  if g_students then (
+  if t.generate_students then (
     (* FIXME what about years? *)
     let student_view (tt : Fet.Timetable.t) =
-      let start, doe = interval_of_timetable duration first tt in
+      let start, doe = interval_of_timetable t.slot_duration first tt in
       mk_event
         ~id:tt.activity_id
         ~location:tt.room
         start
         doe
         ?freq
-        (if show_classes then
+        (if t.show_classes then
            tt.subject ^ " " ^ Fet.Plus.to_string tt.students
          else
            match tt.teachers with
@@ -255,7 +223,7 @@ let bulk tz only duration
           []
       ) |>
       List.flatten |> fun l ->
-      if filter (Fet.No_plus.to_string g) && not nog then
+      if filter (Fet.No_plus.to_string g) && not t.no_groups then
         write (Fet.No_plus.to_string g ^ ".ics") l;
       H.replace group_cals g l
     );
@@ -274,7 +242,7 @@ let bulk tz only duration
         else
           l
       ) timetable from_groups |>
-      if filter (Fet.No_plus.to_string sg) && not nosg then
+      if filter (Fet.No_plus.to_string sg) && not t.no_subgroups then
         write (Fet.No_plus.to_string sg ^ ".ics")
       else
         ignore
@@ -283,4 +251,4 @@ let bulk tz only duration
 
 
 let () =
-  Cmdliner.Term.(exit @@ eval @@ Spec.ical_of_timetable bulk)
+  Cmdliner.Term.(exit @@ eval @@ (const bulk $ Spec.term, Spec.info))
