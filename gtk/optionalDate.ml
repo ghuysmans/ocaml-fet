@@ -1,5 +1,8 @@
 type t = GEdit.combo_box * Spec.date option ref
 
+let date cal =
+  cal#year, cal#month, cal#day
+
 let combo_box ~parent ~empty ~set ~title ~ok ~cancel ~fmt =
   let v = ref None in
   let model, column = GTree.store_of_list Gobject.Data.string [empty; set] in
@@ -30,8 +33,7 @@ let combo_box ~parent ~empty ~set ~title ~ok ~cancel ~fmt =
     else (
       (match dialog#run () with
        | `OK ->
-         let t = cal#day, cal#month, cal#year in
-         v := Some t;
+         v := Some (date cal);
          let row = model#get_iter (GTree.Path.create [1]) in
          model#set ~row ~column (Printf.sprintf fmt cal#day cal#month cal#year);
        | `CANCEL ->
