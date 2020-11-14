@@ -13,7 +13,7 @@ let run prog t =
     | _ -> failwith "failed" (* FIXME *)
 
 let () =
-  let title = "Generate iCalendar files from a FET timetable" in
+  let title = s_ "Generate iCalendar files from a FET timetable" in
   let window = GWindow.window ~title () in
   ignore @@ window#connect#destroy ~callback:Main.quit;
   let vbox = GPack.vbox ~packing:window#add () in
@@ -44,37 +44,37 @@ let () =
   let start = GMisc.calendar () in
   let repeat = OptionalDate.combo_box
     ~parent:window
-    ~empty:"don't repeat"
-    ~set:"select date"
-    ~title:"Select an end date"
-    ~ok:"OK"
-    ~cancel:"Cancel"
-    ~fmt:"until %d/%d/%d"
+    ~empty:(s_ "don't repeat")
+    ~set:(s_ "select date")
+    ~title:(s_ "Select an end date")
+    ~ok:(s_ "OK")
+    ~cancel:(s_ "Cancel")
+    ~fmt:(f_ "until %d/%d/%d")
   in
-  let students = GButton.check_button ~active:true ~label:"generate" () in
-  let show_classes = GButton.check_button ~label:"show classes" () in
-  let no_groups = GButton.check_button ~label:"skip groups" () in
-  let no_subgroups = GButton.check_button ~label:"skip subgroups" () in
-  let teachers = GButton.check_button ~active:true ~label:"generate" () in
-  let rooms = GButton.check_button ~label:"generate" () in
+  let students = GButton.check_button ~active:true ~label:(s_ "generate") () in
+  let show_classes = GButton.check_button ~label:(s_ "show classes") () in
+  let no_groups = GButton.check_button ~label:(s_ "skip groups") () in
+  let no_subgroups = GButton.check_button ~label:(s_ "skip subgroups") () in
+  let teachers = GButton.check_button ~active:true ~label:(s_ "generate") () in
+  let rooms = GButton.check_button ~label:(s_ "generate") () in
   let input = GFile.chooser_button ~action:`OPEN () in (* FIXME filter *)
   let output = GFile.chooser_button ~action:`CREATE_FOLDER () in (* FIXME *)
   let only = GEdit.entry () in (* FIXME filter depending on checkboxes *)
-  only#set_placeholder_text "Select a specific target...";
+  only#set_placeholder_text (s_ "Select a specific target...");
   [
-    "Time zone: ", (fst tz :> GObj.widget);
-    "Start on: ", (start :> GObj.widget);
-    "Repeat: ", (fst repeat :> GObj.widget);
-    "Slot duration: ", (duration_s :> GObj.widget);
-    "FET timetable: ", (input :> GObj.widget);
-    "Output: ", (output :> GObj.widget);
-    "Filter: ", (only :> GObj.widget);
-    "Students: ", (students :> GObj.widget);
+    s_ "Time zone: ", (fst tz :> GObj.widget);
+    s_ "Start on: ", (start :> GObj.widget);
+    s_ "Repeat: ", (fst repeat :> GObj.widget);
+    s_ "Slot duration: ", (duration_s :> GObj.widget);
+    s_ "FET timetable: ", (input :> GObj.widget);
+    s_ "Output: ", (output :> GObj.widget);
+    s_ "Filter: ", (only :> GObj.widget);
+    s_ "Students: ", (students :> GObj.widget);
     "", (no_groups :> GObj.widget);
     "", (no_subgroups :> GObj.widget);
     "", (show_classes :> GObj.widget);
-    "Teachers: ", (teachers :> GObj.widget);
-    "Rooms: ", (rooms :> GObj.widget);
+    s_ "Teachers: ", (teachers :> GObj.widget);
+    s_ "Rooms: ", (rooms :> GObj.widget);
   ] |>
   List.iteri (fun top (text, widget) ->
     let label = GMisc.label ~text () in
@@ -82,12 +82,12 @@ let () =
     grid#attach ~left:0 ~top (label :> GObj.widget);
     grid#attach ~left:1 ~top widget;
   );
-  let button = GButton.button ~label:"Generate" ~packing:vbox#add () in
+  let button = GButton.button ~label:(s_ "Generate") ~packing:vbox#add () in
   ignore @@ button#connect#clicked ~callback:(fun () ->
     match input#filename, GEdit.text_combo_get_active tz, output#filename with
-    | None, _, _ -> failwith "missing input"
-    | _, None, _ -> failwith "missing timezone"
-    | _, _, None -> failwith "missing output"
+    | None, _, _ -> failwith (s_ "missing input")
+    | _, None, _ -> failwith (s_ "missing timezone")
+    | _, _, None -> failwith (s_ "missing output")
     | Some input, Some timezone, Some output_dir ->
       let t = {
         Spec.timezone;

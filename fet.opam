@@ -13,5 +13,6 @@ depends: [
   "icalendar"
   "cmdliner"
   "mdx"
+  "gettext"
 ]
 synopsis: "FET CSV reader/writer and iCalendar generator"

@@ -1,3 +1,5 @@
+open Spec.ProgramGettext.Gettext
+
 open Icalendar
 
 let generation_time =

@@ -1,1 +1,1 @@
-(library (name spec) (libraries ptime cmdliner))
+(library (name spec) (libraries ptime cmdliner gettext-camomile))

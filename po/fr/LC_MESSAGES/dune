@@ -1,0 +1,19 @@
+(rule
+ (deps
+  (:pot ical_of_timetable.pot)
+  (:ml
+   (glob_files ../../../spec/*.ml)
+   (glob_files ../../../gtk/*.ml)))
+ (action
+  (progn
+   (copy %{pot} gen)
+   (run ocaml-gettext --action extract %{ml})
+   (run ocaml-gettext --action merge gen)
+   (bash "cp gen gen.bak") ;FIXME
+   (diff %{pot} gen))))
+(rule
+ (alias pot)
+ (target ical_of_timetable.mo)
+ (deps ical_of_timetable.pot)
+ (action (run ocaml-gettext --action compile %{deps}))
+ (mode (promote (until-clean))))

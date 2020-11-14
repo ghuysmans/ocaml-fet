@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ocaml-fet VERSION\n"
+"Report-Msgid-Bugs-To: https://github.com/ghuysmans/ocaml-fet/issues\n"
+"POT-Creation-Date: 2020-11-14 03:23+0000\n"
+"PO-Revision-Date: 2020-11-14 03:23+0000\n"
+"Last-Translator: Guillaume Huysmans <ghuysmans99@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: ../../../spec/spec.ml:35
+msgid "date"
+msgstr "date"
+
+#: ../../../spec/spec.ml:77
+msgid "don't generate group schedules"
+msgstr "ne pas générer les horaires des groupes"
+
+#: ../../../spec/spec.ml:81
+msgid "don't generate subgroup schedules"
+msgstr "ne pas générer les horaires des sous-groupes"
+
+#: ../../../spec/spec.ml:69
+msgid "generate a single schedule"
+msgstr "générer un seul horaire"
+
+#: ../../../spec/spec.ml:159
+msgid "generate iCal schedules using CSV files exported from FET"
+msgstr "génère des horaires au format iCal en partant de fichiers CSV exportés depuis FET"
+
+#: ../../../spec/spec.ml:61
+msgid "generate room schedules"
+msgstr "générer les horaires des locaux"
+
+#: ../../../spec/spec.ml:57
+msgid "generate student schedules"
+msgstr "générer les horaires des étudiants"
+
+#: ../../../spec/spec.ml:53
+msgid "generate teacher schedules"
+msgstr "générer les horaires des enseignants"
+
+#: ../../../spec/spec.ml:65
+msgid "output directory"
+msgstr "dossier de sortie"
+
+#: ../../../spec/spec.ml:49
+msgid "repeat events weekly before a given date"
+msgstr "répéter les événements chaque semaine avant la date donnée"
+
+#: ../../../spec/spec.ml:73
+msgid "show classes in student schedules"
+msgstr "indiquer les classes dans les horaires des étudiants"
+
+#: ../../../spec/spec.ml:25
+msgid "slot duration (in minutes) when Hour isn't an hh:mm-hh:mm range"
+msgstr "durée d'un créneau horaire (en minutes) quand le champ Heure n'est pas un intervalle hh:mm-hh:mm"
+
+#: ../../../spec/spec.ml:45
+msgid "start from a given date"
+msgstr "démarrer à la date donnée"
+
+#: ../../../spec/spec.ml:85
+msgid "timezone"
+msgstr "fuseau horaire"
+

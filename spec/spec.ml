@@ -1,3 +1,6 @@
+module ProgramGettext = ProgramGettext
+open ProgramGettext.Gettext
+
 type date = Ptime.date
 
 type t = {
@@ -20,7 +23,7 @@ type t = {
 open Cmdliner
 
 let slot_duration =
-  let doc = "slot duration (in minutes) when Hour isn't an hh:mm-hh:mm range" in
+  let doc = s_ "slot duration (in minutes) when Hour isn't an hh:mm-hh:mm range" in
   Arg.(value & opt int 60 & info ~doc ["d"; "duration"])
 
 let ptime_of_date d =
@@ -30,7 +33,7 @@ let ptime_of_date d =
 
 let date =
   let open Ptime in
-  Arg.conv ~docv:"date" ((fun x ->
+  Arg.conv ~docv:(s_ "date") ((fun x ->
     match of_rfc3339 (x ^ "T00:00:00Z") |> rfc3339_error_to_msg with
     | Ok (t, _, _) -> Ok (Ptime.to_date t)
     | Error e -> Error e
@@ -40,47 +43,47 @@ let date =
   )
 
 let first =
-  let doc = "start from a given date" in
+  let doc = s_ "start from a given date" in
   Arg.(value & opt (some date) None & info ~doc ["from"])
 
 let until =
-  let doc = "repeat events weekly before a given date" in
+  let doc = s_ "repeat events weekly before a given date" in
   Arg.(value & opt (some date) None & info ~doc ["u"; "until"; "repeat-until"])
 
 let generate_teachers =
-  let doc = "generate teacher schedules" in
+  let doc = s_ "generate teacher schedules" in
   Arg.(value & flag & info ~doc ["t"; "teachers"])
 
 let generate_students =
-  let doc = "generate student schedules" in
+  let doc = s_ "generate student schedules" in
   Arg.(value & flag & info ~doc ["s"; "students"])
 
 let generate_rooms =
-  let doc = "generate room schedules" in
+  let doc = s_ "generate room schedules" in
   Arg.(value & flag & info ~doc ["r"; "rooms"])
 
 let output_dir =
-  let doc = "output directory" in
+  let doc = s_ "output directory" in
   Arg.(value & opt dir "." & info ~doc ["output-dir"])
 
 let only =
-  let doc = "generate a single schedule" in
+  let doc = s_ "generate a single schedule" in
   Arg.(value & opt (some string) None & info ~doc ["only"])
 
 let show_classes =
-  let doc = "show classes in student schedules" in
+  let doc = s_ "show classes in student schedules" in
   Arg.(value & flag & info ~doc ["c"; "show-classes"])
 
 let no_groups =
-  let doc = "don't generate group schedules" in
+  let doc = s_ "don't generate group schedules" in
   Arg.(value & flag & info ~doc ["no-groups"])
 
 let no_subgroups =
-  let doc = "don't generate subgroup schedules" in
+  let doc = s_ "don't generate subgroup schedules" in
   Arg.(value & flag & info ~doc ["no-subgroups"])
 
 let timezone =
-  let doc = "timezone" in
+  let doc = s_ "timezone" in
   Arg.(value & opt string "Europe/Brussels" & info ~doc ["T"; "timezone"])
 
 let input =
@@ -154,4 +157,5 @@ let term =
     input $ output_dir
 
 let info =
-  info "ical_of_timetable" ~doc:"generate iCal schedules using CSV files exported from FET"
+  let doc = s_ "generate iCal schedules using CSV files exported from FET" in
+  info "ical_of_timetable" ~doc
