@@ -3,66 +3,170 @@ msgstr ""
 "Project-Id-Version: ocaml-fet VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/ghuysmans/ocaml-fet/issues\n"
 "POT-Creation-Date: 2020-11-14 03:23+0000\n"
-"PO-Revision-Date: 2020-11-14 03:23+0000\n"
+"PO-Revision-Date: 2020-11-14 19:48+0000\n"
 "Last-Translator: Guillaume Huysmans <ghuysmans99@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: ../../../spec/spec.ml:35
+#: ../../../gtk/main.ml:52
+msgid "Cancel"
+msgstr "Annuler"
+
+#: ../../../gtk/main.ml:70
+msgid "FET timetable: "
+msgstr "Horaire FET : "
+
+#: ../../../gtk/main.ml:72
+msgid "Filter: "
+msgstr "Filtre : "
+
+#: ../../../gtk/main.ml:86
+msgid "Generate"
+msgstr "Générer"
+
+#: ../../../gtk/main.ml:17
+msgid "Generate iCalendar files from a FET timetable"
+msgstr "Générer des fichiers iCalendar à partir d'un horaire FET"
+
+#: ../../../gtk/main.ml:51
+msgid "OK"
+msgstr "OK"
+
+#: ../../../gtk/main.ml:71
+msgid "Output: "
+msgstr "Destination : "
+
+#: ../../../gtk/main.ml:68
+msgid "Repeat: "
+msgstr "Répéter : "
+
+#: ../../../gtk/main.ml:78
+msgid "Rooms: "
+msgstr "Locaux : "
+
+#: ../../../gtk/main.ml:64
+msgid "Select a specific target..."
+msgstr "Indiquez un objet particulier..."
+
+#: ../../../gtk/main.ml:50
+msgid "Select an end date"
+msgstr "Sélectionnez une date de fin"
+
+#: ../../../gtk/main.ml:69
+msgid "Slot duration: "
+msgstr "Période (h:mm) : "
+
+#: ../../../gtk/main.ml:67
+msgid "Start on: "
+msgstr "Début : "
+
+#: ../../../gtk/main.ml:73
+msgid "Students: "
+msgstr "Étudiants : "
+
+#: ../../../gtk/main.ml:77
+msgid "Teachers: "
+msgstr "Enseignants : "
+
+#: ../../../gtk/main.ml:66
+msgid "Time zone: "
+msgstr "Fuseau horaire : "
+
+#: ../../../spec/spec.ml:36
 msgid "date"
 msgstr "date"
 
-#: ../../../spec/spec.ml:77
+#: ../../../spec/spec.ml:78
 msgid "don't generate group schedules"
 msgstr "ne pas générer les horaires des groupes"
 
-#: ../../../spec/spec.ml:81
+#: ../../../spec/spec.ml:82
 msgid "don't generate subgroup schedules"
 msgstr "ne pas générer les horaires des sous-groupes"
 
-#: ../../../spec/spec.ml:69
+#: ../../../gtk/main.ml:48
+msgid "don't repeat"
+msgstr "ne pas répéter"
+
+#: ../../../gtk/main.ml:60 ../../../gtk/main.ml:59 ../../../gtk/main.ml:55
+msgid "generate"
+msgstr "générer"
+
+#: ../../../spec/spec.ml:70
 msgid "generate a single schedule"
 msgstr "générer un seul horaire"
 
-#: ../../../spec/spec.ml:159
+#: ../../../spec/spec.ml:160
 msgid "generate iCal schedules using CSV files exported from FET"
 msgstr "génère des horaires au format iCal en partant de fichiers CSV exportés depuis FET"
 
-#: ../../../spec/spec.ml:61
+#: ../../../spec/spec.ml:62
 msgid "generate room schedules"
 msgstr "générer les horaires des locaux"
 
-#: ../../../spec/spec.ml:57
+#: ../../../spec/spec.ml:58
 msgid "generate student schedules"
 msgstr "générer les horaires des étudiants"
 
-#: ../../../spec/spec.ml:53
+#: ../../../spec/spec.ml:54
 msgid "generate teacher schedules"
 msgstr "générer les horaires des enseignants"
 
-#: ../../../spec/spec.ml:65
+#: ../../../gtk/main.ml:89
+msgid "missing input"
+msgstr "entrée manquante"
+
+#: ../../../gtk/main.ml:91
+msgid "missing output"
+msgstr "sortie manquante"
+
+#: ../../../gtk/main.ml:90
+msgid "missing timezone"
+msgstr "fuseau horaire manquant"
+
+#: ../../../spec/spec.ml:66
 msgid "output directory"
 msgstr "dossier de sortie"
 
-#: ../../../spec/spec.ml:49
+#: ../../../spec/spec.ml:50
 msgid "repeat events weekly before a given date"
 msgstr "répéter les événements chaque semaine avant la date donnée"
 
-#: ../../../spec/spec.ml:73
+#: ../../../gtk/main.ml:49
+msgid "select date"
+msgstr "sélectionner une date"
+
+#: ../../../gtk/main.ml:56
+msgid "show classes"
+msgstr "montrer les classes"
+
+#: ../../../spec/spec.ml:74
 msgid "show classes in student schedules"
 msgstr "indiquer les classes dans les horaires des étudiants"
 
-#: ../../../spec/spec.ml:25
+#: ../../../gtk/main.ml:57
+msgid "skip groups"
+msgstr "ignorer les groupes"
+
+#: ../../../gtk/main.ml:58
+msgid "skip subgroups"
+msgstr "ignorer les sous-groupes"
+
+#: ../../../spec/spec.ml:26
 msgid "slot duration (in minutes) when Hour isn't an hh:mm-hh:mm range"
 msgstr "durée d'un créneau horaire (en minutes) quand le champ Heure n'est pas un intervalle hh:mm-hh:mm"
 
-#: ../../../spec/spec.ml:45
+#: ../../../spec/spec.ml:46
 msgid "start from a given date"
 msgstr "démarrer à la date donnée"
 
-#: ../../../spec/spec.ml:85
+#: ../../../spec/spec.ml:86
 msgid "timezone"
 msgstr "fuseau horaire"
+
+#: ../../../gtk/main.ml:53
+msgid "until %d/%d/%d"
+msgstr "avant le %d/%d/%d"
 

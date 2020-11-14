@@ -1,4 +1,5 @@
 open GMain
+open Spec.ProgramGettext.Gettext
 
 let _locale = GtkMain.Main.init ()
 

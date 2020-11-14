@@ -9,6 +9,7 @@ stdenv.mkDerivation {
     lablgtk3
     ptime
     cmdliner
+    ocaml_gettext
     vim
   ];
   #for grep!
