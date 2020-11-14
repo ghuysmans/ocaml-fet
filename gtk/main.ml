@@ -2,6 +2,16 @@ open GMain
 
 let _locale = GtkMain.Main.init ()
 
+let run prog t =
+  let open Unix in
+  let argv = Spec.argv prog t in
+  Array.iter prerr_endline argv;
+  create_process prog argv stdin stdout stderr |>
+  waitpid [] |>
+  snd |> function
+    | WEXITED 0 -> ()
+    | _ -> failwith "failed" (* FIXME *)
+
 let () =
   let title = "Generate iCalendar files from a FET timetable" in
   let window = GWindow.window ~title () in
@@ -74,18 +84,28 @@ let () =
   );
   let button = GButton.button ~label:"Generate" ~packing:vbox#add () in
   ignore @@ button#connect#clicked ~callback:(fun () ->
-    if students#active then prerr_endline "students";
-    if teachers#active then prerr_endline "teachers";
-    if rooms#active then prerr_endline "rooms";
-    prerr_endline (match GEdit.text_combo_get_active tz with
-      | None -> "no timezone"
-      | Some tz -> "timezone=" ^ tz
-    );
-    prerr_endline @@ Printf.sprintf "duration=%f" duration#value;
-    prerr_endline (match output#filename with
-      | None -> "no output"
-      | Some f -> "output=" ^ f
-    );
+    match input#filename, GEdit.text_combo_get_active tz, output#filename with
+    | None, _, _ -> failwith "missing input"
+    | _, None, _ -> failwith "missing timezone"
+    | _, _, None -> failwith "missing output"
+    | Some input, Some timezone, Some output_dir ->
+      let t = {
+        Spec.timezone;
+        slot_duration = int_of_float duration#value;
+        first = Some (OptionalDate.date start);
+        until = !(snd repeat);
+        only = if only#text = "" then None else Some only#text;
+        generate_teachers = teachers#active;
+        generate_students = students#active;
+        show_classes = show_classes#active;
+        no_groups = no_groups#active;
+        no_subgroups = no_subgroups#active;
+        generate_rooms = rooms#active;
+        input;
+        output_dir = Filename.dirname output_dir;
+      } in
+      let prog = "_build/default/bin/ical_of_timetable.exe" in
+      run prog t
   );
   window#show ();
   Main.main ()

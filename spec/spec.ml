@@ -106,6 +106,28 @@ let () =
   assert (prefix ~timetable:"/a/b/x_timetable.csv" = Some "x_")
 
 
+let argv prog t =
+  let open Dsl in
+  let date = conv date in
+  [[prog]] |>
+  named "T" string t.timezone |>
+  option "only" string t.only |>
+  named "d" int t.slot_duration |>
+  option "from" date t.first |>
+  option "u" date t.until |>
+  flag "t" t.generate_teachers |>
+  flag "c" t.show_classes |>
+  flag "no-groups" t.no_groups |>
+  flag "no-subgroups" t.no_subgroups |>
+  flag "s" t.generate_students |>
+  flag "r" t.generate_rooms |>
+  named "output-dir" string t.output_dir |>
+  list string [t.input] |>
+  List.rev |>
+  List.flatten |>
+  Array.of_list
+
+
 open Term
 
 let term =
